@@ -44,7 +44,7 @@ LED_PIN.direction = Direction.OUTPUT
 
 SWITCH_PIN = DigitalInOut(D3)
 SWITCH_PIN.direction = Direction.INPUT
-SWITCH_PIN_ON=True
+SWITCH_PIN_ON=False
 
 UDP_SHUTDOWN_SH_PORT=50001
 
