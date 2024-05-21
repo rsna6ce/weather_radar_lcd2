@@ -7,6 +7,6 @@ sleep 10s
 # start script (if stopped auto restart)
 while :
 do
-  python3 weather_radar_lcd.py
+  python3 weather_radar_lcd2.py
   sleep 1s
 done
