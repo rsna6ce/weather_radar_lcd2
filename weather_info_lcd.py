@@ -23,9 +23,9 @@ def putText_japanese(img, text, point, size, color, anchor):
     draw.text((x,y), text, fill=color, font=font)
     return np.array(img_pil)
 
-class WeatherInfo(threading.Thread):
+class WeatherInfoThread(threading.Thread):
     def __init__(self, display, lock_lcd):
-        super(WeatherInfo, self).__init__()
+        super(WeatherInfoThread, self).__init__()
         self.stop_event = threading.Event()
         self.display = display
         self.lock_lcd = lock_lcd

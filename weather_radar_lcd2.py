@@ -44,6 +44,7 @@ LED_PIN.direction = Direction.OUTPUT
 
 SWITCH_PIN = DigitalInOut(D3)
 SWITCH_PIN.direction = Direction.INPUT
+SWITCH_PIN_ON=True
 
 UDP_SHUTDOWN_SH_PORT=50001
 
@@ -248,7 +249,7 @@ def weather_rader_lcd2():
     display_img(IN_PREPARATION_PNG)
     LED_PIN.value = True
 
-    weather_info_th = weather_info_lcd.WeatherInfo(display, lock_lcd)
+    weather_info_th = weather_info_lcd.WeatherInfoThread(display, lock_lcd)
     weather_info_th.daemon = True
     weather_info_th.start()
 
@@ -266,7 +267,7 @@ def weather_rader_lcd2():
     switch_value_prev = False
     while True:
         # 10sec touch switch to shutdown pc
-        if SWITCH_PIN.value:
+        if SWITCH_PIN.value==SWITCH_PIN_ON:
             if poweroff_time < datetime.datetime.now():
                 logger_write("shutdown ...")
                 status_sleep=True
@@ -280,7 +281,7 @@ def weather_rader_lcd2():
         # 1shot touch switch to display radar
         if switch_value_prev != SWITCH_PIN.value:
             switch_value_prev = SWITCH_PIN.value
-            if not SWITCH_PIN.value:
+            if SWITCH_PIN.value != SWITCH_PIN_ON:
                 LED_PIN.value = True
                 display_radar_images()
                 led_off_time = datetime.datetime.now() + datetime.timedelta(minutes=LED_OFF_MINUTE)
