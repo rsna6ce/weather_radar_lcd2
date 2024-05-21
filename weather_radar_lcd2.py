@@ -6,11 +6,13 @@ import datetime
 import threading
 import copy
 import glob
+import socket
+
 from busio import SPI
 from board import SCK, MOSI, MISO, D8, D18, D23, D24, D2, D3
 from digitalio import DigitalInOut, Direction
 from adafruit_rgb_display.rgb import color565
-from adafruit_rgb_display.ili9341 import ILI9341
+from adafruit_rgb_display.ili9488 import ILI9488
 from PIL import Image, ImageDraw
 import cv2
 
@@ -24,12 +26,12 @@ from selenium.webdriver.chrome import service as fs
 from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import WebDriverException
 
-import socket
+import weather_info
 
 #### user configurations ####
 URL_HP = 'https://tenki.jp/radar/3/15/'
 URL_IMG = 'https://imageflux.tenki.jp/large/static-images/radar/{0:04}/{1:02}/{2:02}/{3:02}/{4:02}/00/pref-15-large.jpg'
-IMAGE_CACHE_LENGTH_MINUTE = 120  # from 60 to 120 minute
+IMAGE_CACHE_LENGTH_MINUTE = 60  # from 60 to 120 minute
 IMAGE_CACHE_INTERVAL_MINUTE = 5  # 10 or 5 minute
 LED_OFF_MINUTE=30
 ####
@@ -46,15 +48,15 @@ SWITCH_PIN.direction = Direction.INPUT
 UDP_SHUTDOWN_SH_PORT=50001
 
 spi = SPI(clock=SCK, MOSI=MOSI, MISO=MISO)
-display = ILI9341(
+display = ILI9488(
     spi,
     cs = CS_PIN,
     dc = DC_PIN,
     rst = RESET_PIN,
-    width = 240,
-    height = 320,
-    rotation = 90,
-    baudrate=24000000)
+    width = 320,
+    height = 480,
+    rotation = 0,
+    baudrate=50000000)
 
 IN_PREPARATION_PNG = 'img/in_preparation.png'
 ERROR_PNG = 'img/error.png'
@@ -70,6 +72,7 @@ status_sleep = False
 
 filenames = []
 lock_filenames = threading.Lock()
+lock_lcd = threading.Lock()
 
 class DownloaderThread(threading.Thread):
     def __init__(self):
@@ -85,8 +88,9 @@ class DownloaderThread(threading.Thread):
         while True:
             dt_now = datetime.datetime.now()
             if dt_next < dt_now:
-                download_radar_images()
-                dt_next = dt_now + delta_next
+                result = download_radar_images()
+                if result:
+                    dt_next = dt_now + delta_next
             time.sleep(1)
             if self.stop_event.is_set():
                 break
@@ -141,7 +145,9 @@ def set_filenames(arg_filenames):
 
 def get_latest_filename():
     lock_filenames.acquire()
-    latest_filename = filenames[-1]
+    latest_filename = ''
+    if len(filenames):
+        latest_filename = filenames[-1]
     lock_filenames.release()
     return latest_filename
 
@@ -150,12 +156,13 @@ def download_radar_images():
     global status_download_error_count
     global status_sleep
 
+    result = True
     options = Options()
     options.add_argument('--headless')
     browser = webdriver.Chrome(service=CHROME_SERVICE, options=options)
     try:
         logger_write("http get started ...")
-        browser.set_page_load_timeout(120)
+        browser.set_page_load_timeout(180)
         browser.get(URL_HP)
         logger_write("http get finished")
         soup = BeautifulSoup(str(browser.page_source),  'html.parser')
@@ -193,12 +200,13 @@ def download_radar_images():
     except Exception as e:
         logger_write("exception detecred !!!")
         logger_write(str(e))
+        result = False
         status_download_error_count += 1
         if (not status_sleep) and (status_download_error_count>DOWNLOAD_ERROR_RETRY_COUNT):
             display_img(ERROR_PNG)
     finally:
         browser.quit()
-        return
+        return result
 
 def display_radar_images(latest_only = False):
     temp_filenames = get_filenames()
@@ -211,9 +219,9 @@ def display_radar_images(latest_only = False):
             img = cv2.imread(filename, cv2.IMREAD_COLOR)
             img = cv2.resize(img, (320, 240),  interpolation = cv2.INTER_AREA)
             bar_height = 5
-            bar_width = 280
+            bar_width = 320
             cv2.rectangle(img, (0, 239-bar_height), (bar_width, 239), (0, 0, 0), thickness=-1)
-            cv2.rectangle(img, (0, 239-bar_height), (int(bar_width*(i+1)/file_count), 239), (255, 255, 255), thickness=-1)
+            cv2.rectangle(img, (0, 239-bar_height), (int(bar_width*(i+1)/file_count), 239), (0, 0, 255), thickness=-1)
             img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
             frame = Image.fromarray(img)
             display.image(frame)
@@ -232,11 +240,16 @@ def cleanup_unused_images():
             logger_write("Creanup delete " + filename)
             os.remove(filename)
 
-def main():
+def weather_rader_lcd2():
     global status_sleep
     logger_write("weather_rader_lcd.py main stared.")
+    display.fill(color565((255,255,255)))
     display_img(IN_PREPARATION_PNG)
     LED_PIN.value = True
+
+    weather_info_th = weather_info.WeatherInfo(display, lock_lcd)
+    weather_info_th.daemon = True
+    weather_info_th.start()
 
     download_radar_images()
     display_radar_images(latest_only = True)
@@ -280,10 +293,14 @@ def main():
             cleanup_time = datetime.datetime.now() + datetime.timedelta(minutes=CLEANUP_MINUTE)
         latest_filename = get_latest_filename()
         # auto display latest image
-        if latest_filename_prev != latest_filename:
+        if latest_filename!='' and latest_filename_prev != latest_filename:
             latest_filename_prev = latest_filename
             display_radar_images(latest_only = True)
         time.sleep(0.1)
+
+
+def main():
+    weather_rader_lcd2()
 
 if __name__ == '__main__':
     sys.exit(main())
