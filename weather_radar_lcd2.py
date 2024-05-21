@@ -27,6 +27,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import WebDriverException
 
 import weather_info_lcd
+import datetime_lcd
 
 #### user configurations ####
 URL_HP = 'https://tenki.jp/radar/3/15/'
@@ -252,6 +253,10 @@ def weather_rader_lcd2():
     weather_info_th = weather_info_lcd.WeatherInfoThread(display, lock_lcd)
     weather_info_th.daemon = True
     weather_info_th.start()
+
+    #datetime_th = datetime_lcd.DatetimeLcdThread()
+    #datetime_th.daemon = True
+    #datetime_th.start()
 
     download_radar_images()
     display_radar_images(latest_only = True)
