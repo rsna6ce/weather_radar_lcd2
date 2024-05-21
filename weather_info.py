@@ -165,8 +165,8 @@ class WeatherInfo(threading.Thread):
             y = i // 6
             base_pos_x = (col_width * x) + 32
             base_pos_y = (row_height*5) * y
-            offset_x = -8
-            offset_y = -13
+            offset_x = -9
+            offset_y = -14
 
             cv2.rectangle(img, (base_pos_x, base_pos_y+(row_height*0)), (base_pos_x+col_width-1,  base_pos_y+(row_height*1)-1), grid_color) #time
             img = putText_japanese(img, time_list[i].rjust(2), (base_pos_x+col_width+offset_x, base_pos_y+(row_height*1)+offset_y), 26, (255, 0, 0), 'rb')
