@@ -26,7 +26,7 @@ from selenium.webdriver.chrome import service as fs
 from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import WebDriverException
 
-import weather_info
+import weather_info_lcd
 
 #### user configurations ####
 URL_HP = 'https://tenki.jp/radar/3/15/'
@@ -248,7 +248,7 @@ def weather_rader_lcd2():
     display_img(IN_PREPARATION_PNG)
     LED_PIN.value = True
 
-    weather_info_th = weather_info.WeatherInfo(display, lock_lcd)
+    weather_info_th = weather_info_lcd.WeatherInfo(display, lock_lcd)
     weather_info_th.daemon = True
     weather_info_th.start()
 
