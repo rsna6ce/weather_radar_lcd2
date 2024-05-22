@@ -215,9 +215,9 @@ class WeatherInfoThread(threading.Thread):
             cv2.rectangle(img, (base_pos_x, base_pos_y+(row_height*4)), (base_pos_x+col_width-1,  base_pos_y+(row_height*5)-1), grid_color) #wind
             img = putText_japanese(img, wind_list[i].rjust(2), (base_pos_x+col_width+offset_x, base_pos_y+(row_height*5)+offset_y), 26, (0, 0, 0), 'rb')
 
+            # convert cv2-BGR -> PIL_RGB
+            img2 = Image.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
             with self.lock_lcd:
-                # convert cv2-BGR -> PIL_RGB
-                img2 = Image.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
                 self.display.image(img2, x=0, y=240)
 
 def main():

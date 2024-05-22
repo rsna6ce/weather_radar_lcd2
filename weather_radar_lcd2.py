@@ -130,7 +130,8 @@ def display_img(filename, error_mark=False):
     if error_mark:
         cv2.rectangle(img, (0, 0), (2, 2), (255, 255, 255), thickness=-1)
     frame = Image.fromarray(img)
-    display.image(frame)
+    with lock_lcd:
+        display.image(frame)
 
 # get filenames snapshot
 def get_filenames():
@@ -227,7 +228,8 @@ def display_radar_images(latest_only = False):
             cv2.rectangle(img, (0, 239-bar_height), (int(bar_width*(i+1)/file_count), 239), (0, 0, 255), thickness=-1)
             img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
             frame = Image.fromarray(img)
-            display.image(frame)
+            with lock_lcd:
+                display.image(frame)
             time.sleep(0.2)
     if file_count > 0:
         display_img(temp_filenames[file_count-1], error_mark=(status_download_error_count>0))
