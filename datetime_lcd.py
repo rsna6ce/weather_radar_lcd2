@@ -5,10 +5,15 @@ import time
 import datetime
 import threading
 import board
+from board import D5, D6
 from busio import I2C
 from adafruit_ssd1306 import SSD1306_I2C
 from PIL import Image, ImageDraw, ImageFont
 
+from adafruit_extended_bus import ExtendedI2C
+#pip3 install adafruit-extended-bus
+# /boot/config.txt
+#   dtoverlay=i2c-gpio,bus=11,i2c_gpio_sda=5,i2c_gpio_scl=6
 
 class DatetimeLcdThread(threading.Thread):
     def __init__(self):
@@ -20,7 +25,8 @@ class DatetimeLcdThread(threading.Thread):
 
     def run(self):
         weekday_list = ['mon','tue','wed','thu','fri','sat','sun']
-        i2c = I2C(scl=board.SCL, sda=board.SDA)
+        #i2c = I2C(scl=board.D5, sda=board.D6)
+        i2c = ExtendedI2C(11, frequency=40000)
         lcd = SSD1306_I2C(128, 32, i2c, addr=0x3C)
         font = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf', 15)
         prev_second = -1
