@@ -9,8 +9,8 @@ import glob
 import socket
 
 from busio import SPI
-from board import SCK, MOSI, MISO, D8, D18, D23, D24, D2, D3
-from digitalio import DigitalInOut, Direction
+from board import SCK, MOSI, MISO, D8, D18, D23, D24, D2, D3, D14
+from digitalio import DigitalInOut, Direction, Pull
 from adafruit_rgb_display.rgb import color565
 from adafruit_rgb_display.ili9488 import ILI9488
 from PIL import Image, ImageDraw
@@ -28,6 +28,7 @@ from selenium.common.exceptions import WebDriverException
 
 import weather_info_lcd
 import datetime_lcd
+import ultrasound_echo
 
 #### user configurations ####
 URL_HP = 'https://tenki.jp/radar/3/15/'
@@ -45,7 +46,7 @@ LED_PIN.direction = Direction.OUTPUT
 
 SWITCH_PIN = DigitalInOut(D3)
 SWITCH_PIN.direction = Direction.INPUT
-SWITCH_PIN_ON=False
+SWITCH_PIN_ON=True
 
 UDP_SHUTDOWN_SH_PORT=50001
 
@@ -254,9 +255,14 @@ def weather_rader_lcd2():
     weather_info_th.daemon = True
     weather_info_th.start()
 
-    #datetime_th = datetime_lcd.DatetimeLcdThread()
-    #datetime_th.daemon = True
-    #datetime_th.start()
+    datetime_th = datetime_lcd.DatetimeLcdThread()
+    datetime_th.daemon = True
+    datetime_th.start()
+
+    ultrasound_echo_threshold = 1.0
+    ultrasound_echo_th = ultrasound_echo.UltrasoundEchoThread()
+    ultrasound_echo_th.daemon = True
+    ultrasound_echo_th.start()
 
     download_radar_images()
     display_radar_images(latest_only = True)
@@ -284,9 +290,13 @@ def weather_rader_lcd2():
         else:
             poweroff_time = datetime.datetime.now() + datetime.timedelta(seconds=POWEROFF_SEC)
         # 1shot touch switch to display radar
-        if switch_value_prev != SWITCH_PIN.value:
+        latest_distance, loop_count= ultrasound_echo_th.get_latest_distance_min()
+        usecho_detect = (latest_distance < ultrasound_echo_threshold)
+        if usecho_detect:
+            print('latest_distance', latest_distance, 'loop_count',loop_count)
+        if switch_value_prev != SWITCH_PIN.value or usecho_detect:
             switch_value_prev = SWITCH_PIN.value
-            if SWITCH_PIN.value != SWITCH_PIN_ON:
+            if SWITCH_PIN.value != SWITCH_PIN_ON or usecho_detect:
                 LED_PIN.value = True
                 display_radar_images()
                 led_off_time = datetime.datetime.now() + datetime.timedelta(minutes=LED_OFF_MINUTE)
