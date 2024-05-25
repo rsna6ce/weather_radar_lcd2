@@ -47,16 +47,15 @@ class WeatherInfoThread(threading.Thread):
                 break
 
     def refresh_weather_info(self):
-        r = requests.get(target_url)
-        bs = BeautifulSoup(r.text, 'html.parser')
-        flick_list_1hours = bs.find_all('div', class_='wx1h_content')
-
+        time_list=[]
+        weather_list=[]
+        rain_list=[]
+        temp_list=[]
+        wind_list=[]
         try:
-            time_list=[]
-            weather_list=[]
-            rain_list=[]
-            temp_list=[]
-            wind_list=[]
+            r = requests.get(target_url)
+            bs = BeautifulSoup(r.text, 'html.parser')
+            flick_list_1hours = bs.find_all('div', class_='wx1h_content')
             for flick_list_1hour in flick_list_1hours:
 
                 # parse time
@@ -114,6 +113,13 @@ class WeatherInfoThread(threading.Thread):
                     wind_text = wind.find('p').text
                     wind_text = wind_text.replace(' ','').replace('\n','').replace('m','')
                     wind_list.append(wind_text)
+
+            temp_cache = (
+                ''.join(time_list) +
+                ''.join(weather_list) +
+                ''.join(rain_list) +
+                ''.join(temp_list) +
+                ''.join(wind_list) )
         except Exception as e:
             logger_write("weather_info : exception detecred !!!")
             logger_write(str(e))
@@ -122,6 +128,8 @@ class WeatherInfoThread(threading.Thread):
             rain_list = ['??'] * weather_info_count
             temp_list = ['??'] * weather_info_count
             wind_list = ['??'] * weather_info_count
+            dt_now = datetime.datetime.now()
+            temp_cache = '???_' + dt_now.strftime('%Y/%m/%d_%H:%M:%S')
 
         #print(time_list)
         #print(weather_list)
@@ -129,17 +137,17 @@ class WeatherInfoThread(threading.Thread):
         #print(temp_list)
         #print(wind_list)
 
-        temp_cache = (
-            ''.join(time_list) +
-            ''.join(weather_list) +
-            ''.join(rain_list) +
-            ''.join(temp_list) + 
-            ''.join(wind_list) )
         if temp_cache == self.cache:
             #logger_write('INFO: cache matched. refresh_weather_info display image skipped.')
             return
-
-        self.cache = temp_cache
+        else:
+            self.cache = temp_cache
+            logger_write('INFO: refresh weather_info display...')
+            logger_write('INFO: weather_info' + ', '.join(time_list))
+            logger_write('INFO: weather_info' + ', '.join(weather_list))
+            logger_write('INFO: weather_info' + ', '.join(rain_list))
+            logger_write('INFO: weather_info' + ', '.join(temp_list))
+            logger_write('INFO: weather_info' + ', '.join(wind_list))
 
         img = np.full((240, 320, 3), 255, dtype=np.uint8)
 
@@ -219,6 +227,7 @@ class WeatherInfoThread(threading.Thread):
         img2 = Image.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
         with self.lock_lcd:
             self.display.image(img2, x=0, y=240)
+            logger_write('INFO: refresh weather_info display finished.')
 
 def main():
     pass
