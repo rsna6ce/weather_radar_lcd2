@@ -49,6 +49,8 @@ class DatetimeLcdThread(threading.Thread):
                 lcd.show()
             time.sleep(0.1)
             if self.stop_event.is_set():
+                lcd.fill(0)
+                lcd.show()
                 break
 
 

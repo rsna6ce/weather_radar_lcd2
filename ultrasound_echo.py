@@ -40,7 +40,7 @@ class UltrasoundEchoThread(threading.Thread):
                     self.loop_count += 1
                     to2 = time.time()
                     if to2-to1 > self.timeout:
-                        raise
+                        raise Exception
                 t1 = time.time() # pulse up time
 
                 while echo_pin.value:
@@ -59,7 +59,7 @@ class UltrasoundEchoThread(threading.Thread):
             except KeyboardInterrupt:
                 break
             except Exception as e:
-                print(e)
+                print('Exception in us_echo_th', e)
                 echo_pin.direction = Direction.OUTPUT
                 time.sleep(0.2)
                 trig_pin.value = True

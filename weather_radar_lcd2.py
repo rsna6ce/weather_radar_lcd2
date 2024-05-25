@@ -261,7 +261,7 @@ def weather_rader_lcd2():
     datetime_th.daemon = True
     datetime_th.start()
 
-    ultrasound_echo_threshold = 1.0
+    ultrasound_echo_threshold = 0.8
     ultrasound_echo_th = ultrasound_echo.UltrasoundEchoThread()
     ultrasound_echo_th.daemon = True
     ultrasound_echo_th.start()
@@ -288,7 +288,9 @@ def weather_rader_lcd2():
                 udp_shutdown_sh_address = ('127.0.0.1', UDP_SHUTDOWN_SH_PORT)
                 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
                 send_len = sock.sendto('shutdown now'.encode('utf-8'), udp_shutdown_sh_address)
+                datetime_th.stop()
                 time.sleep(30)
+                sys.exit(0)
         else:
             poweroff_time = datetime.datetime.now() + datetime.timedelta(seconds=POWEROFF_SEC)
         # 1shot touch switch to display radar
