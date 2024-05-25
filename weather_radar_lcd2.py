@@ -300,7 +300,7 @@ def weather_rader_lcd2():
             print('latest_distance', latest_distance, 'loop_count',loop_count)
         if switch_value_prev != SWITCH_PIN.value or usecho_detect:
             switch_value_prev = SWITCH_PIN.value
-            if SWITCH_PIN.value != SWITCH_PIN_ON or usecho_detect:
+            if SWITCH_PIN.value == SWITCH_PIN_ON or usecho_detect:
                 LED_PIN.value = True
                 display_radar_images()
                 led_off_time = datetime.datetime.now() + datetime.timedelta(minutes=LED_OFF_MINUTE)
