@@ -31,7 +31,7 @@
 | 2 | 5V Power | HC-SR04 | Vcc |
 | 38 | GPIO20(PCM_DIN) | HC-SR04 | Trig |
 | 40 | GPIO21(PCM_DOUT) | HC-SR04 | Echo |
-| 34 | Gnd | HC-SR04 | Ground |
+| 39 | Gnd | HC-SR04 | Ground |
 | 29 | GPIO5 | OLED | SDA |
 | 31 | GPIO6 | OLED | SCK |
 | 1 | 3V3 Power | OLED | VCC |
