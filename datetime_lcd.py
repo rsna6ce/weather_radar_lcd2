@@ -28,6 +28,7 @@ class DatetimeLcdThread(threading.Thread):
         #i2c = I2C(scl=board.D5, sda=board.D6)
         i2c = ExtendedI2C(11, frequency=40000)
         lcd = SSD1306_I2C(128, 32, i2c, addr=0x3C)
+        lcd.rotate(False)
         font = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf', 15)
         prev_second = -1
         while True:
