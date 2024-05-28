@@ -167,7 +167,8 @@ class WeatherInfoThread(threading.Thread):
         img[row_height*8:row_height*8+h, icon_left:icon_left+w] = cv2.imread('img/TEMP2.png')
         img[row_height*9:row_height*9+h, icon_left:icon_left+w] = cv2.imread('img/WIND2.png')
         
-        grid_color=(242,242,242)
+        fill_color=(255,248,248)
+        grid_color=(240,240,240)
         for i in range(weather_info_count):
             x = i % 6
             y = i // 6
@@ -176,6 +177,7 @@ class WeatherInfoThread(threading.Thread):
             offset_x = -9
             offset_y = -14
 
+            cv2.rectangle(img, (base_pos_x, base_pos_y+(row_height*0)), (base_pos_x+col_width-1,  base_pos_y+(row_height*1)-1), fill_color, thickness=-1) #time
             cv2.rectangle(img, (base_pos_x, base_pos_y+(row_height*0)), (base_pos_x+col_width-1,  base_pos_y+(row_height*1)-1), grid_color) #time
             img = putText_japanese(img, time_list[i].rjust(2), (base_pos_x+col_width+offset_x, base_pos_y+(row_height*1)+offset_y), 26, (255, 0, 0), 'rb')
             
