@@ -154,20 +154,20 @@ class WeatherInfoThread(threading.Thread):
         col_width = 48
         row_height = 24
         icon_left=2
-        icon = cv2.imread('img/CLOCK2.png')
+        icon = cv2.imread('img/CLOCK3.png')
         h, w = icon.shape[:2]
         img[row_height*0:row_height*0+h, icon_left:icon_left+w] = icon
         img[row_height*1:row_height*1+h, icon_left:icon_left+w] = cv2.imread('img/WEATHER2.png')
-        img[row_height*2:row_height*2+h, icon_left:icon_left+w] = cv2.imread('img/WATER2.png')
-        img[row_height*3:row_height*3+h, icon_left:icon_left+w] = cv2.imread('img/TEMP2.png')
+        img[row_height*2:row_height*2+h, icon_left:icon_left+w] = cv2.imread('img/TEMP2.png')
+        img[row_height*3:row_height*3+h, icon_left:icon_left+w] = cv2.imread('img/WATER2.png')
         img[row_height*4:row_height*4+h, icon_left:icon_left+w] = cv2.imread('img/WIND2.png')
         img[row_height*5:row_height*5+h, icon_left:icon_left+w] = icon
         img[row_height*6:row_height*6+h, icon_left:icon_left+w] = cv2.imread('img/WEATHER2.png')
-        img[row_height*7:row_height*7+h, icon_left:icon_left+w] = cv2.imread('img/WATER2.png')
-        img[row_height*8:row_height*8+h, icon_left:icon_left+w] = cv2.imread('img/TEMP2.png')
+        img[row_height*7:row_height*7+h, icon_left:icon_left+w] = cv2.imread('img/TEMP2.png')
+        img[row_height*8:row_height*8+h, icon_left:icon_left+w] = cv2.imread('img/WATER2.png')
         img[row_height*9:row_height*9+h, icon_left:icon_left+w] = cv2.imread('img/WIND2.png')
         
-        fill_color=(255,248,248)
+        fill_color=(84,84,84)
         grid_color=(240,240,240)
         for i in range(weather_info_count):
             x = i % 6
@@ -179,7 +179,7 @@ class WeatherInfoThread(threading.Thread):
 
             cv2.rectangle(img, (base_pos_x, base_pos_y+(row_height*0)), (base_pos_x+col_width-1,  base_pos_y+(row_height*1)-1), fill_color, thickness=-1) #time
             cv2.rectangle(img, (base_pos_x, base_pos_y+(row_height*0)), (base_pos_x+col_width-1,  base_pos_y+(row_height*1)-1), grid_color) #time
-            img = putText_japanese(img, time_list[i].rjust(2), (base_pos_x+col_width+offset_x, base_pos_y+(row_height*1)+offset_y), 26, (255, 0, 0), 'rb')
+            img = putText_japanese(img, time_list[i].rjust(2), (base_pos_x+col_width+offset_x, base_pos_y+(row_height*1)+offset_y), 26, (255, 255, 255), 'rb')
             
             if weather_list[i] in ['100','123','124','130','131','500','550','600']:
                 # sunny
@@ -216,11 +216,11 @@ class WeatherInfoThread(threading.Thread):
 
             cv2.rectangle(img, (base_pos_x, base_pos_y+(row_height*1)), (base_pos_x+col_width-1,  base_pos_y+(row_height*2)-1), grid_color) #weather
 
-            cv2.rectangle(img, (base_pos_x, base_pos_y+(row_height*2)), (base_pos_x+col_width-1,  base_pos_y+(row_height*3)-1), grid_color) #rain
-            img = putText_japanese(img, rain_list[i].rjust(2), (base_pos_x+col_width+offset_x, base_pos_y+(row_height*3)+offset_y), 26, (0, 0, 0), 'rb')
+            cv2.rectangle(img, (base_pos_x, base_pos_y+(row_height*2)), (base_pos_x+col_width-1,  base_pos_y+(row_height*3)-1), grid_color) #temp
+            img = putText_japanese(img, temp_list[i].rjust(2), (base_pos_x+col_width+offset_x, base_pos_y+(row_height*3)+offset_y), 26, (0, 0, 0), 'rb')
 
-            cv2.rectangle(img, (base_pos_x, base_pos_y+(row_height*3)), (base_pos_x+col_width-1,  base_pos_y+(row_height*4)-1), grid_color) #temp
-            img = putText_japanese(img, temp_list[i].rjust(2), (base_pos_x+col_width+offset_x, base_pos_y+(row_height*4)+offset_y), 26, (0, 0, 0), 'rb')
+            cv2.rectangle(img, (base_pos_x, base_pos_y+(row_height*3)), (base_pos_x+col_width-1,  base_pos_y+(row_height*4)-1), grid_color) #rain
+            img = putText_japanese(img, rain_list[i].rjust(2), (base_pos_x+col_width+offset_x, base_pos_y+(row_height*4)+offset_y), 26, (0, 0, 0), 'rb')
 
             cv2.rectangle(img, (base_pos_x, base_pos_y+(row_height*4)), (base_pos_x+col_width-1,  base_pos_y+(row_height*5)-1), grid_color) #wind
             img = putText_japanese(img, wind_list[i].rjust(2), (base_pos_x+col_width+offset_x, base_pos_y+(row_height*5)+offset_y), 26, (0, 0, 0), 'rb')
