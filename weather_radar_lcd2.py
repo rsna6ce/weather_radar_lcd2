@@ -203,10 +203,11 @@ def download_radar_images():
         status_download_error_count = 0
         logger_write("download_radar_images finished.")
     except Exception as e:
-        logger_write("exception detecred !!!")
+        logger_write("download_radar_images : exception detecred !!!")
         logger_write(str(e))
         result = False
         status_download_error_count += 1
+        logger_write("status_download_error_count : {}".format(status_download_error_count))
         if (not status_sleep) and (status_download_error_count>DOWNLOAD_ERROR_RETRY_COUNT):
             display_img(ERROR_PNG)
     finally:
