@@ -249,7 +249,7 @@ def cleanup_unused_images():
 
 def weather_rader_lcd2():
     global status_sleep
-    logger_write("weather_rader_lcd.py main stared.")
+    logger_write("weather_rader_lcd.py main stared. =========================================")
     display.fill(color565((255,255,255)))
     display_img(IN_PREPARATION_PNG)
     LED_PIN.value = True
@@ -262,7 +262,7 @@ def weather_rader_lcd2():
     datetime_th.daemon = True
     datetime_th.start()
 
-    ultrasound_echo_threshold = 0.8
+    ultrasound_echo_threshold = 0.5
     ultrasound_echo_th = ultrasound_echo.UltrasoundEchoThread()
     ultrasound_echo_th.daemon = True
     ultrasound_echo_th.start()
@@ -298,7 +298,7 @@ def weather_rader_lcd2():
         latest_distance, loop_count= ultrasound_echo_th.get_latest_distance_min()
         usecho_detect = (latest_distance < ultrasound_echo_threshold)
         if usecho_detect:
-            print('latest_distance', latest_distance, 'loop_count',loop_count)
+            logger_write('latest_distance:{} loop_count:{}'.format(latest_distance, loop_count))
         if switch_value_prev != SWITCH_PIN.value or usecho_detect:
             switch_value_prev = SWITCH_PIN.value
             if SWITCH_PIN.value == SWITCH_PIN_ON or usecho_detect:
