@@ -58,7 +58,7 @@ display = ILI9488(
     rst = RESET_PIN,
     width = 320,
     height = 480,
-    rotation = 0,
+    rotation = 180,
     baudrate=50000000)
 
 IN_PREPARATION_PNG = 'img/in_preparation.png'
@@ -132,7 +132,7 @@ def display_img(filename, error_mark=False):
         cv2.rectangle(img, (0, 0), (2, 2), (255, 255, 255), thickness=-1)
     frame = Image.fromarray(img)
     with lock_lcd:
-        display.image(frame)
+        display.image(frame, x=0, y=240)
 
 # get filenames snapshot
 def get_filenames():
@@ -231,7 +231,7 @@ def display_radar_images(latest_only = False):
             img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
             frame = Image.fromarray(img)
             with lock_lcd:
-                display.image(frame)
+                display.image(frame, x=0, y=240)
             time.sleep(0.2)
     if file_count > 0:
         display_img(temp_filenames[file_count-1], error_mark=(status_download_error_count>0))

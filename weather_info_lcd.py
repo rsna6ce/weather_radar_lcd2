@@ -228,7 +228,7 @@ class WeatherInfoThread(threading.Thread):
         # convert cv2-BGR -> PIL_RGB
         img2 = Image.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
         with self.lock_lcd:
-            self.display.image(img2, x=0, y=240)
+            self.display.image(img2, x=0, y=0)
             logger_write('INFO: refresh weather_info display finished.')
 
 def main():
