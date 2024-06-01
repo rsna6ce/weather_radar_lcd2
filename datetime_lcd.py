@@ -19,16 +19,15 @@ class DatetimeLcdThread(threading.Thread):
     def __init__(self):
         super(DatetimeLcdThread, self).__init__()
         self.stop_event = threading.Event()
+        i2c = ExtendedI2C(11, frequency=40000)
+        self.lcd = SSD1306_I2C(128, 32, i2c, addr=0x3C)
+        self.lcd.rotate(False)
 
     def stop(self):
         self.stop_event.set()
 
     def run(self):
         weekday_list = ['mon','tue','wed','thu','fri','sat','sun']
-        #i2c = I2C(scl=board.D5, sda=board.D6)
-        i2c = ExtendedI2C(11, frequency=40000)
-        lcd = SSD1306_I2C(128, 32, i2c, addr=0x3C)
-        lcd.rotate(False)
         font = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf', 15)
         prev_second = -1
         while True:
@@ -41,20 +40,21 @@ class DatetimeLcdThread(threading.Thread):
                 weekday = dt_now.weekday() #monday:0 ... sunday:6
                 weekday_str = weekday_list[weekday]
                 weekday_img = Image.open("img/{}.png".format(weekday_str))
-                image = Image.new("1", (lcd.width, lcd.height))
+                image = Image.new("1", (self.lcd.width, self.lcd.height))
                 draw = ImageDraw.Draw(image)
                 draw.text((4, 1),date_str, font=font, fill=255)
                 draw.text((4, 17),time_str + '  ' + weekday_str, font=font, fill=255)
                 image.paste(weekday_img, (106, 1))
-                lcd.image(image)
-                lcd.show()
+                self.lcd.image(image)
+                self.lcd.show()
             time.sleep(0.1)
             if self.stop_event.is_set():
-                lcd.fill(0)
-                lcd.show()
+                self.lcd.fill(0)
+                self.lcd.show()
                 break
 
-
+    def contrast(self, value):
+        self.lcd.contrast(value)
 
 def main():
     pass

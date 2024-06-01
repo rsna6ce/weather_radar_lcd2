@@ -68,7 +68,7 @@ CHROMEDRIVER = "/usr/lib/chromium-browser/chromedriver"
 CHROME_SERVICE = fs.Service(executable_path=CHROMEDRIVER)
 POWEROFF_SEC=5
 CLEANUP_MINUTE=10
-DOWNLOAD_ERROR_RETRY_COUNT = 1
+DOWNLOAD_ERROR_RETRY_COUNT = 3
 
 status_download_error_count = 0
 status_sleep = False
@@ -261,6 +261,7 @@ def weather_rader_lcd2():
     datetime_th = datetime_lcd.DatetimeLcdThread()
     datetime_th.daemon = True
     datetime_th.start()
+    datetime_th.contrast(255)
 
     ultrasound_echo_threshold = 0.5
     ultrasound_echo_th = ultrasound_echo.UltrasoundEchoThread()
@@ -303,11 +304,13 @@ def weather_rader_lcd2():
             switch_value_prev = SWITCH_PIN.value
             if SWITCH_PIN.value == SWITCH_PIN_ON or usecho_detect:
                 LED_PIN.value = True
+                datetime_th.contrast(255)
                 display_radar_images()
                 led_off_time = datetime.datetime.now() + datetime.timedelta(minutes=LED_OFF_MINUTE)
         # auto led off timer
         if led_off_time < datetime.datetime.now():
             LED_PIN.value = False
+            datetime_th.contrast(0)
         # auto cleanup image timer
         if cleanup_time < datetime.datetime.now():
             cleanup_unused_images()
