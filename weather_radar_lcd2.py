@@ -69,6 +69,7 @@ CHROME_SERVICE = fs.Service(executable_path=CHROMEDRIVER)
 POWEROFF_SEC=5
 CLEANUP_MINUTE=10
 DOWNLOAD_ERROR_RETRY_COUNT = 3
+DOWNLOAD_HTTP_TIMEOUT_SEC = 300
 
 status_download_error_count = 0
 status_sleep = False
@@ -166,10 +167,13 @@ def download_radar_images():
     options.add_argument('--headless')
     browser = webdriver.Chrome(service=CHROME_SERVICE, options=options)
     try:
+        start = time.perf_counter()
         logger_write("http get started ...")
-        browser.set_page_load_timeout(180)
+        browser.set_page_load_timeout(DOWNLOAD_HTTP_TIMEOUT_SEC)
         browser.get(URL_HP)
-        logger_write("http get finished")
+        finished = time.perf_counter()
+        elapsed = (finished - start)
+        logger_write("http get finished ({}s)".format(int(elapsed)))
         soup = BeautifulSoup(str(browser.page_source),  'html.parser')
         elem_radar_source = soup.find(id='radar-source')
         if elem_radar_source == None:
