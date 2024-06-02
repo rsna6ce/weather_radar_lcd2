@@ -7,6 +7,7 @@ import threading
 import copy
 import glob
 import socket
+import requests
 
 from busio import SPI
 from board import SCK, MOSI, MISO, D8, D18, D23, D24, D2, D3, D14
@@ -166,15 +167,20 @@ def download_radar_images():
     options = Options()
     options.add_argument('--headless')
     browser = webdriver.Chrome(service=CHROME_SERVICE, options=options)
+    browser.set_page_load_timeout(DOWNLOAD_HTTP_TIMEOUT_SEC)
     try:
         start = time.perf_counter()
         logger_write("http get started ...")
-        browser.set_page_load_timeout(DOWNLOAD_HTTP_TIMEOUT_SEC)
-        browser.get(URL_HP)
+        if False: #debug
+            r = requests.get(URL_HP)
+            html_page_source = r.text
+        else:
+            browser.get(URL_HP)
+            html_page_source = str(browser.page_source)
         finished = time.perf_counter()
         elapsed = (finished - start)
         logger_write("http get finished ({}s)".format(int(elapsed)))
-        soup = BeautifulSoup(str(browser.page_source),  'html.parser')
+        soup = BeautifulSoup(html_page_source,  'html.parser')
         elem_radar_source = soup.find(id='radar-source')
         if elem_radar_source == None:
             logger_write("elem_radar_source is None !!!")
