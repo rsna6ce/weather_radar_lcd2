@@ -94,9 +94,8 @@ class DownloaderThread(threading.Thread):
             dt_now = datetime.datetime.now()
             if dt_next < dt_now:
                 result = download_radar_images()
-                if result:
-                    dt_now = datetime.datetime.now()
-                    dt_next = dt_now + delta_next
+                dt_now = datetime.datetime.now()
+                dt_next = dt_now + delta_next
             time.sleep(1)
             if self.stop_event.is_set():
                 break

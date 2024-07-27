@@ -183,7 +183,12 @@ class WeatherInfoThread(threading.Thread):
             
             if weather_list[i] in ['100','123','124','130','131','500','550','600']:
                 # sunny
-                icon = cv2.imread('img/SUNNY2.png')
+                if int(time_list[i]) <= 4 or 19 <= int(time_list[i]):
+                    # night
+                    icon = cv2.imread('img/MOON2.png')
+                else:
+                    # daytime
+                    icon = cv2.imread('img/SUNNY2.png')
                 h, w = icon.shape[:2]
                 ofset_x = int((col_width-w)/2)
                 img[base_pos_y+(row_height*1):base_pos_y+(row_height*1)+h, base_pos_x+ofset_x:base_pos_x+ofset_x+w] = icon
