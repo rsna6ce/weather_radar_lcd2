@@ -57,62 +57,67 @@ class WeatherInfoThread(threading.Thread):
             bs = BeautifulSoup(r.text, 'html.parser')
             flick_list_1hours = bs.find_all('div', class_='wx1h_content')
             for flick_list_1hour in flick_list_1hours:
+                now_lists = flick_list_1hour.find_all(class_='list')
+                for now_list in now_lists:
+                    class_names = now_list.get('class')
+                    if 'past' in class_names:
+                        continue
 
-                # parse time
-                times = flick_list_1hour.find_all(class_='time')
-                for time in times:
-                    if len(time_list) >= weather_info_count:
-                        break
-                    #<p>t</p>
-                    time_text = time.find('p').text
-                    time_list.append(time_text)
+                    # parse time
+                    times = now_list.find_all(class_='time')
+                    for time in times:
+                        if len(time_list) >= weather_info_count:
+                            break
+                        #<p>t</p>
+                        time_text = time.find('p').text
+                        time_list.append(time_text)
 
-                # parse weather icon name
-                weathers = flick_list_1hour.find_all(class_='weather')
-                for weather in weathers:
-                    if len(weather_list) >= weather_info_count:
-                        break
-                    #https://weathernews.jp/onebox/img/wxicon/300.png
-                    img = weather.find('img')
-                    img_src = img['src']
-                    left = img_src.rfind('/') + len('/')
-                    right = img_src.find('.png')
-                    img_src_number = img_src[left:right]
-                    weather_list.append(img_src_number)
+                    # parse weather icon name
+                    weathers = now_list.find_all(class_='weather')
+                    for weather in weathers:
+                        if len(weather_list) >= weather_info_count:
+                            break
+                        #https://weathernews.jp/onebox/img/wxicon/300.png
+                        img = weather.find('img')
+                        img_src = img['src']
+                        left = img_src.rfind('/') + len('/')
+                        right = img_src.find('.png')
+                        img_src_number = img_src[left:right]
+                        weather_list.append(img_src_number)
 
-                # parse rain
-                rains = flick_list_1hour.find_all(class_='rain')
-                for rain in rains:
-                    if len(rain_list) >= weather_info_count:
-                        break
-                    #<p>r    \n<span>ミリ</span></p>
-                    rain_text = rain.find('p').text
-                    rain_text = rain_text.replace(' ','').replace('\n','').replace('ミリ','').replace('0.','.')
-                    if len(rain_text) > 2:
-                        rain_text = '99' #over 100mm rain -> 99mm
-                    rain_list.append(rain_text)
+                    # parse rain
+                    rains = now_list.find_all(class_='rain')
+                    for rain in rains:
+                        if len(rain_list) >= weather_info_count:
+                            break
+                        #<p>r    \n<span>ミリ</span></p>
+                        rain_text = rain.find('p').text
+                        rain_text = rain_text.replace(' ','').replace('\n','').replace('ミリ','').replace('0.','.')
+                        if len(rain_text) > 2:
+                            rain_text = '99' #over 100mm rain -> 99mm
+                        rain_list.append(rain_text)
 
-                # parse temp
-                temps = flick_list_1hour.find_all(class_='temp')
-                for temp in temps:
-                    if len(temp_list) >= weather_info_count:
-                        break
-                    #<p>t<span>℃</span></p>
-                    temp_str = str(temp.find('p'))
-                    left = temp_str.find('<p>') + len('<p>')
-                    right = temp_str.find('<span>')
-                    temp_text = temp_str[left:right]
-                    temp_list.append(temp_text)
+                    # parse temp
+                    temps = now_list.find_all(class_='temp')
+                    for temp in temps:
+                        if len(temp_list) >= weather_info_count:
+                            break
+                        #<p>t<span>℃</span></p>
+                        temp_str = str(temp.find('p'))
+                        left = temp_str.find('<p>') + len('<p>')
+                        right = temp_str.find('<span>')
+                        temp_text = temp_str[left:right]
+                        temp_list.append(temp_text)
 
-                # parse wind
-                winds = flick_list_1hour.find_all(class_='wind')
-                for wind in winds:
-                    if len(wind_list) >= weather_info_count:
-                        break
-                    #<p>r    \n<span>m</span></p>
-                    wind_text = wind.find('p').text
-                    wind_text = wind_text.replace(' ','').replace('\n','').replace('m','')
-                    wind_list.append(wind_text)
+                    # parse wind
+                    winds = now_list.find_all(class_='wind')
+                    for wind in winds:
+                        if len(wind_list) >= weather_info_count:
+                            break
+                        #<p>r    \n<span>m</span></p>
+                        wind_text = wind.find('p').text
+                        wind_text = wind_text.replace(' ','').replace('\n','').replace('m','')
+                        wind_list.append(wind_text)
 
             temp_cache = (
                 ''.join(time_list) +
