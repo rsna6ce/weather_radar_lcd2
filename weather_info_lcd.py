@@ -40,7 +40,11 @@ class WeatherInfoThread(threading.Thread):
         while True:
             dt_now = datetime.datetime.now()
             if dt_next < dt_now:
-                self.refresh_weather_info()
+                try:
+                    self.refresh_weather_info()
+                except Exception as e:
+                    logger_write("weather_info run : exception detecred !!!")
+                    logger_write(str(e))
                 dt_next = dt_now + delta_next
             time.sleep(1)
             if self.stop_event.is_set():
