@@ -99,6 +99,7 @@ class DownloaderThread(threading.Thread):
             time.sleep(1)
             if self.stop_event.is_set():
                 break
+        logger_write('DownloaderThread run break!!')
 
 def logger_write(msg):
     dt_now = datetime.datetime.now()
@@ -170,7 +171,7 @@ def download_radar_images():
     try:
         start = time.perf_counter()
         logger_write("http get started ...")
-        if False: #debug
+        if True: #debug
             r = requests.get(URL_HP)
             html_page_source = r.text
         else:
